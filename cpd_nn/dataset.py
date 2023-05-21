@@ -82,35 +82,40 @@ class SynthDatasetClassification:
             use_pos_ixs = np.random.choice(self.pos_ixs, cnt_use_pos_ixs, replace=True)
             self.ixs = np.concatenate((self.neg_ixs, use_pos_ixs))
     
-    def get_trainloader(self, batch_size, shuffle_train=True):
+    def get_trainloader(self, batch_size, model_type, shuffle_train=True):
         if self.balancing  == 'None':
+            if model_type == 'LSTM':
+                x = torch.tensor(self.x[:self.threshold]).unsqueeze(dim=-1)
+            elif model_type == 'MLP':
+                x = torch.tensor(self.x[:self.threshold])
+
             return DataLoader(
                 torch.utils.data.TensorDataset(
-                    torch.tensor(self.x[:self.threshold]).unsqueeze(dim=-1),
+                    x,
                     torch.tensor(self.y[:self.threshold]).unsqueeze(dim=-1)
                 ), shuffle=shuffle_train, batch_size=batch_size
             )
         else:
+            if model_type == 'LSTM':
+                x = torch.tensor(self.x[self.ixs]).unsqueeze(dim=-1)
+            elif model_type == 'MLP':
+                x = torch.tensor(self.x[self.ixs])
             return DataLoader(
                 torch.utils.data.TensorDataset(
-                    torch.tensor(self.x[self.ixs]).unsqueeze(dim=-1),
+                    x,
                     torch.tensor(self.y[self.ixs]).unsqueeze(dim=-1)
                 ), shuffle=shuffle_train, batch_size=batch_size
             )
     
-    def get_testloader(self, batch_size):
-        if self.balancing == 'None':
-            return DataLoader(
-                torch.utils.data.TensorDataset(
-                    torch.tensor(self.x[self.threshold:]).unsqueeze(dim=-1),
-                    torch.tensor(self.y[self.threshold:]).unsqueeze(dim=-1)
-                ), batch_size=batch_size, shuffle=False
-            )
+    def get_testloader(self, batch_size, model_type):
+        if model_type == 'LSTM':
+            x = torch.tensor(self.x[self.threshold:]).unsqueeze(dim=-1)
+        elif model_type == 'MLP':
+            x = torch.tensor(self.x[self.threshold:])
+
         return DataLoader(
             torch.utils.data.TensorDataset(
-                torch.tensor(self.x[self.threshold:]).unsqueeze(dim=-1),
+                x,
                 torch.tensor(self.y[self.threshold:]).unsqueeze(dim=-1)
             ), shuffle=False, batch_size=batch_size
         )
-
-# class SynthDatasetRegression()
