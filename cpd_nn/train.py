@@ -65,7 +65,7 @@ def validate_epoch(model, loss_fn, data_loader, tqdm_desc, device, calc_metric):
 
     return val_loss, val_roc_auc, val_ap
 
-def train(model, optimizer, loss_fn, train_loader, val_loader, num_epochs, device, scheduler = None, use_wandb = False, calc_metric = False):
+def train(model, optimizer, loss_fn, train_loader, val_loader, num_epochs, device, scheduler = None, use_wandb = False, calc_metric = False, save_weights=False, save_path='', save_freq=5):
     train_losses = []
     train_roc_aucs = []
     train_aps = []
@@ -106,6 +106,9 @@ def train(model, optimizer, loss_fn, train_loader, val_loader, num_epochs, devic
                     'val_loss': val_loss,
                 })
         clear_output()
+
+        if save_weights and epoch % save_freq == 0:
+            torch.save(model.state_dict(), save_path + 'model_' + str(epoch) + '.pt')
     
     return {
         'TRAIN': {

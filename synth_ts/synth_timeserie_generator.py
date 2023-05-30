@@ -99,7 +99,7 @@ def demonstrate_result(ts, cp_ixs, probs, T, val=False, seq_len=1000):
         axs[i].legend()
 
         ax2 = axs[i].twinx()
-        ax2.plot(np.arange(LB, RB), probs[LB:RB], color='red')
+        ax2.scatter(np.arange(LB, RB), probs[LB:RB], color='red')
     ts = ts * np.pi
 
 def show_zoomed_result(ts, cp_ixs, probs, T, LB, RB, val=False):
